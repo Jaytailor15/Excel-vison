@@ -1,24 +1,23 @@
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ExcelData } from '@/lib/types';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DataRow } from "@/lib/store";
 
 interface DataVisualizationProps {
-  data: DataRow[];
+  data: ExcelData[];
   columns: string[];
 }
 
 export function DataVisualization({ data, columns }: DataVisualizationProps) {
-  // Select first numeric column for visualization
   const numericColumn = columns.find(col => 
     data.some(row => typeof row[col] === 'number')
   );
@@ -39,8 +38,8 @@ export function DataVisualization({ data, columns }: DataVisualizationProps) {
   }
 
   const chartData = data.slice(0, 10).map(row => ({
-    name: row[columns[0]],
-    value: row[numericColumn],
+    name: String(row[columns[0]]),
+    value: Number(row[numericColumn]),
   }));
 
   return (

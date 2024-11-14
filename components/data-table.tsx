@@ -1,17 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  getFilteredRowModel,
-  ColumnFiltersState,
-} from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -20,14 +10,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { DataRow } from "@/lib/store";
+import { ExcelData } from '@/lib/types';
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
 import { Download } from "lucide-react";
+import { useState } from "react";
 import * as XLSX from 'xlsx';
 
 interface DataTableProps {
-  data: DataRow[];
+  data: ExcelData[];
   columns: string[];
 }
 
@@ -35,10 +35,10 @@ export function DataTable({ data, columns }: DataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const tableColumns: ColumnDef<DataRow>[] = columns.map((col) => ({
+  const tableColumns: ColumnDef<ExcelData>[] = columns.map((col) => ({
     accessorKey: col,
     header: col,
-    cell: (info) => info.getValue(),
+    cell: (info) => info.getValue()?.toString() ?? '',
   }));
 
   const table = useReactTable({

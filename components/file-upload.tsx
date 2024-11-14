@@ -4,14 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/components/ui/use-toast';
 import { useDataStore } from '@/lib/store';
+import { ExcelData } from '@/lib/types';
 import { Upload, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import * as XLSX from 'xlsx';
-
-interface ExcelData {
-    [key: string]: any;
-}
 
 export function FileUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -52,33 +49,31 @@ export function FileUpload() {
 
   const processExcelFile = async (file: File) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = (e: ProgressEvent<FileReader>) => {
       try {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        if (!e.target?.result) throw new Error('No result');
+        
+        const data = new Uint8Array(e.target.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: 'array' });
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet) as ExcelData[];
         
         if (jsonData.length > 0) {
-          const columns = Object.keys(jsonData[0] as ExcelData);
+          const columns = Object.keys(jsonData[0]);
           setColumns(columns);
-          setData(jsonData as ExcelData[]);
+          setData(jsonData);
           
           toast({
-            title: "File processed successfully",
-            description: `Found ${jsonData.length} rows of data`
+            title: "Success",
+            description: `Processed ${jsonData.length} rows of data`
           });
         } else {
-          toast({
-            title: "Empty file",
-            description: "The uploaded file contains no data",
-            variant: "destructive"
-          });
+          throw new Error('Empty file');
         }
       } catch (error) {
         toast({
-          title: "Error processing file",
-          description: "There was an error reading your Excel file",
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to process file",
           variant: "destructive"
         });
       }

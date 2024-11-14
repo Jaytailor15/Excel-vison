@@ -1,13 +1,10 @@
 import { create } from 'zustand';
-
-export interface DataRow {
-  [key: string]: string | number;
-}
+import { ExcelData } from './types';
 
 interface DataStore {
-  data: DataRow[];
+  data: ExcelData[];
   columns: string[];
-  setData: (data: DataRow[]) => void;
+  setData: (data: ExcelData[]) => void;
   setColumns: (columns: string[]) => void;
   clearData: () => void;
 }
