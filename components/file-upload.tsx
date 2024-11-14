@@ -1,13 +1,17 @@
 "use client";
 
-import { useCallback, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/components/ui/use-toast';
-import * as XLSX from 'xlsx';
 import { useDataStore } from '@/lib/store';
+import { Upload, X } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import * as XLSX from 'xlsx';
+
+interface ExcelData {
+    [key: string]: any;
+}
 
 export function FileUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -56,9 +60,9 @@ export function FileUpload() {
         const jsonData = XLSX.utils.sheet_to_json(firstSheet);
         
         if (jsonData.length > 0) {
-          const columns = Object.keys(jsonData[0]);
+          const columns = Object.keys(jsonData[0] as ExcelData);
           setColumns(columns);
-          setData(jsonData);
+          setData(jsonData as ExcelData[]);
           
           toast({
             title: "File processed successfully",
