@@ -16,38 +16,7 @@ export function FileUpload() {
   const { toast } = useToast();
   const { setData, setColumns, clearData } = useDataStore();
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const uploadedFile = acceptedFiles[0];
-    if (uploadedFile) {
-      if (!uploadedFile.name.match(/\.(xlsx|xls|csv)$/)) {
-        toast({
-          title: "Invalid file type",
-          description: "Please upload an Excel or CSV file",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      setFile(uploadedFile);
-      simulateUpload();
-      processExcelFile(uploadedFile);
-    }
-  }, [toast, setData, setColumns]);
-
-  const simulateUpload = () => {
-    setProgress(0);
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 100);
-  };
-
-  const processExcelFile = async (file: File) => {
+  const processExcelFile = useCallback(async (file: File) => {
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
       try {
@@ -79,6 +48,37 @@ export function FileUpload() {
       }
     };
     reader.readAsArrayBuffer(file);
+  }, [setData, setColumns, toast]);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const uploadedFile = acceptedFiles[0];
+    if (uploadedFile) {
+      if (!uploadedFile.name.match(/\.(xlsx|xls|csv)$/)) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload an Excel or CSV file",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setFile(uploadedFile);
+      simulateUpload();
+      processExcelFile(uploadedFile);
+    }
+  }, [toast, processExcelFile]);
+
+  const simulateUpload = () => {
+    setProgress(0);
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 100);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
